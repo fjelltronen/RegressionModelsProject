@@ -1,8 +1,8 @@
 ---
-title: "Regression Models -- Analysis of the MTCARS Dataset"
+title: "Car Transmission vs. Fuel Consumption -- Regression Models"
 author: "fjelltronen"
 date: "May 13, 2018"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Executive Summary
 
-This report explores the relationship between a set of car-related variable and the miles-per-gallon attribute. First, we introduce the `mtcars` dataset. Then we ... 
+This report explores the relationship between a set of car-related variable and the miles-per-gallon attribute. First, we introduce the `mtcars` dataset. Then we fit a linear model and use its coeficients to determine that manual transmissions lead to a better fuel consumption when compared with automatic ones, by an estimated 7.245 miles-per-gallon.
 
 ### MTCARS Dataset
 
@@ -27,17 +27,32 @@ Convert some of the numeric variables into factors, including `am` (transmission
 mtcars$am <- factor(mtcars$am)
 ```
 
-A quick exploration of the relationship between `am` and `mpg` is shown below.
+A quick exploration of the relationship between the `am` and `mpg` variables is shown graphically in the Appendix.
+
+## Is an automatic or manual transmission better for `mpg`? / Quantify the `mpg` difference between automatic and manual transmissions
+
+Let us fit a linear model with `mpg` as the outcome and `am` as the regressor. The coeficients of this least square regression model can help answer these questions. 
 
 ```{r}
-library(ggplot2)
-ggplot(data = mtcars, aes(x = am, y = mpg)) + geom_point(size = 3, alpha = 0.4, color = "lightseagreen") +
-  labs(title = "mpg for automatic/manual transmissions", x = "transmission", y = "fuel consumption")
+fit <- lm(mpg~am, data = mtcars)
+coefficients(fit)
 ```
 
-## Is an automatic or manual transmission better for MPG?
+The adjusted estimate for the expected change in `mpg` when comparing automatic transmission (`(Intercept)` or `am0`) and manual transmission (`am1`) is `7.245`. This positive number indicates that the automatic transmission is worse for `mpg` (less miles-per-gallon imply worse fuel consumption). More specifically, the estimated difference in `mpg` between automatic and manual transmissions is 7.245 (the mean of `am1` is `24.392`, `7.245` higher than the mean of `am0`, which is `17.147`).
 
-## Quantify the MPG difference between automatic and manual transmissions
+```{r}
+summary(fit)
+```
+
+Since the p-value of this coefficient is `0.000285` (< 0.05), the t-test for H_0: no difference between `am0` and `am1` versus H_a: difference between `am0` and `am1` is *significant*.
+
+Furthermore, in order to evaluate the fit and residuals of the generated model, we use diagnostic plots.
+
+```{r}
+par(mfrow = c(2, 2)); plot(fit)
+```
+
+The model does not capture the variance in `mpg` for each type of transmission. Its residuals are normally distributed and spred equally along the range of predictors. No cases are influential with respect to Cook's distance.
 
 ## Appendix
 
@@ -46,4 +61,19 @@ ggplot(data = mtcars, aes(x = am, y = mpg)) + geom_point(size = 3, alpha = 0.4, 
 ```{r}
 # structure of the data set
 str(mtcars)
+# value counts for `am`
+table(mtcars$am)
+# mpg for automatic/manual transmission
+library(ggplot2)
+library(gridExtra)
+g1 <- ggplot(data = mtcars, aes(x = am, y = mpg, color = am)) + 
+  geom_boxplot() + geom_point(size = 3, alpha = 0.4) + 
+  labs(title = "mpg vs. am", 
+       x = "transmission (0 = automatic, 1 = manual)", y = "fuel consumption")
+g2 <- ggplot(data = mtcars, aes(x = mpg, color = am)) + geom_density() +
+  labs(title = "mpg density")
+grid.arrange(g1, g2, ncol = 2)
 ```
+
+
+
