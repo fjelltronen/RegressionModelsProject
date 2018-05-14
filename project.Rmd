@@ -1,0 +1,49 @@
+---
+title: "Regression Models -- Analysis of the MTCARS Dataset"
+author: "fjelltronen"
+date: "May 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary
+
+This report explores the relationship between a set of car-related variable and the miles-per-gallon attribute. First, we introduce the `mtcars` dataset. Then we ... 
+
+### MTCARS Dataset
+
+The Motor Trend Car Road Tests data consists of fuel consumption and 10 aspects of automobile design/performance for 32 cars. A brief analysis of the data is shown in the Appendix below.
+
+```{r, echo=FALSE}
+data(mtcars)
+```
+
+Convert some of the numeric variables into factors, including `am` (transmission information, where `0` is automatic and `1` is manual):
+
+```{r}
+mtcars$am <- factor(mtcars$am)
+```
+
+A quick exploration of the relationship between `am` and `mpg` is shown below.
+
+```{r}
+library(ggplot2)
+ggplot(data = mtcars, aes(x = am, y = mpg)) + geom_point(size = 3, alpha = 0.4, color = "lightseagreen") +
+  labs(title = "mpg for automatic/manual transmissions", x = "transmission", y = "fuel consumption")
+```
+
+## Is an automatic or manual transmission better for MPG?
+
+## Quantify the MPG difference between automatic and manual transmissions
+
+## Appendix
+
+### `mtcars` dataset
+
+```{r}
+# structure of the data set
+str(mtcars)
+```
